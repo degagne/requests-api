@@ -14,10 +14,10 @@ setup(
     package_dir={"requests_api": "requests_api"},
     install_requires=[
         "urllib3",
-        "nested_lookup",
+        "nested-lookup",
         "requests>=2.25",
-        "requests_oauthlib>=1.3",
-        "requests_ntlm3>=6.1",
+        "requests-oauthlib>=1.3",
+        "requests-ntlm3>=6.1",
         "requests-kerberos>=0.12",
     ],
     author="Deric Degagne",
