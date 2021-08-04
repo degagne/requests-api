@@ -17,7 +17,7 @@ setup(
         "nested-lookup",
         "requests>=2.25",
         "requests-oauthlib>=1.3",
-        "requests-ntlm3>=6.1",
+        "requests-ntlm3>=6",
         "requests-kerberos>=0.12",
     ],
     author="Deric Degagne",
