@@ -1,6 +1,6 @@
-[![RequestsAPI Version](https://img.shields.io/pypi/v/requests-api?style=for-the-badge)](https://pypi.org/project/python-ssh/)
 # requests-api
 
+[![RequestsAPI Version](https://img.shields.io/pypi/v/requests-api?style=for-the-badge)](https://pypi.org/project/python-ssh/)
 [![RequestsAPI Status](https://img.shields.io/pypi/status/python-ssh?style=for-the-badge)](https://pypi.org/project/requests-api)
 [![RequestsAPI Python Versions](https://img.shields.io/pypi/pyversions/requests-api?style=for-the-badge)](https://pypi.org/project/requests-api/)
 [![RequestsAPI Release](https://img.shields.io/github/release/degagne/requests-api?style=for-the-badge)](https://github.com/degagne/requests-api/releases/)
