@@ -1,6 +1,5 @@
-=================
-requests_api.auth
-=================
+auth
+####
 
 .. automodule:: requests_api.auth
     :members:
