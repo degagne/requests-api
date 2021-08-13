@@ -13,7 +13,7 @@ formats: all
 
 build:
   apt_packages:
-    - build-essential
+    - krb5-multidev
 
 python:
   version: 3.6
