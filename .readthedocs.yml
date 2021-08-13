@@ -11,6 +11,10 @@ sphinx:
 # Optionally build your docs in additional formats such as PDF and ePub
 formats: all
 
+build:
+  apt_packages:
+    - build-essential
+
 python:
   version: 3.6
   install:
