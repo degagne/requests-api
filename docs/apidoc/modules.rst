@@ -2,7 +2,6 @@ requests-api API
 ################
 
 .. toctree::
-    api
+    core
     auth
-    requests
     adapter
