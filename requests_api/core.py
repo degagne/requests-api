@@ -1,4 +1,5 @@
 import json
+import simplejson
 import requests
 
 from requests import Session
@@ -125,7 +126,7 @@ class Requests:
         if not response.content:
             return True
 
-        with suppress(json.JSONDecodeError):
+        with suppress(json.JSONDecodeError, simplejson.JSONDecodeError):
             response = response.json()
             if not search_keys:
                 return response
