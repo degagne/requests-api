@@ -3,9 +3,8 @@ import simplejson
 import requests
 
 from requests import Session
-from typing import NoReturn, Union, Optional, TextIO, Dict, Any, List
+from typing import NoReturn, Union, Optional, TextIO
 from requests_api.constants import (
-    HEADERS,
     STATUS_CODES,
     GET,
     HEAD,
@@ -13,7 +12,6 @@ from requests_api.constants import (
     PUT,
     DELETE,
     PATCH,
-    SCHEMA
 )
 from requests_api.errors import RequestError
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth

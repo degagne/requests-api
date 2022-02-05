@@ -15,9 +15,3 @@ STATUS_CODES = {
     DELETE: [200, 202, 204],
     PATCH:  [200, 204]
 }
-
-# default headers for all requests
-HEADERS = {"Content-type": "application/json"}
-
-# default schema for requests
-SCHEMA = "https"

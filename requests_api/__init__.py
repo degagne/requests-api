@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from requests_api.core import Requests
-from requests_api.adapter import RetryAdapter
 from requests_api.errors import RequestError, HTTPError
 from requests_api.auth import (
     basic_auth,
@@ -13,7 +12,6 @@ from requests_api.auth import (
 
 __all__ = [
     "Requests",
-    "RetryAdapter",
     "RequestError",
     "HTTPError",
     "basic_auth",
