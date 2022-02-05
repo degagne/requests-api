@@ -198,8 +198,7 @@ class Requests:
                 requests.ConnectionError,
                 requests.Timeout,
                 requests.exceptions.RequestException) as exception:
-            message = getattr(exception, "message")
-            raise RequestError(message.strip(), response.status_code)
+            raise RequestError(exception, response.status_code)
         finally:
             session.close()
 
