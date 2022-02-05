@@ -26,7 +26,7 @@ License
 =======
     
 ``requests-api`` is licensed under MIT license. See the `LICENSE <https://github.com/degagne/requests-api/blob/master/LICENSE>`_ for more information
-    
+
 Links
 =====
 
