@@ -3,7 +3,7 @@ import simplejson
 import requests
 
 from requests import Session
-from typing import NoReturn, Union, Optional, TextIO, Type, Dict, Any, List
+from typing import NoReturn, Union, Optional, TextIO, Dict, Any, List
 from requests_api.constants import (
     HEADERS,
     STATUS_CODES,
@@ -13,11 +13,9 @@ from requests_api.constants import (
     PUT,
     DELETE,
     PATCH,
-    MAX_RETRIES,
     SCHEMA
 )
 from requests_api.errors import RequestError
-from requests_api.adapter import RetryAdapter
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests_oauthlib import OAuth2
 from requests_ntlm3 import HttpNtlmAuth
@@ -32,47 +30,145 @@ class Requests:
     def __init__(
         self,
         baseurl: str,
-        auth: Union[HTTPBasicAuth, HTTPDigestAuth, OAuth2, HttpNtlmAuth, 
-                    HTTPKerberosAuth],
+        auth: Union[HTTPBasicAuth, HTTPDigestAuth, OAuth2, HttpNtlmAuth, HTTPKerberosAuth],
         verify: Optional[Union[bool, TextIO]] = False,
-        retries: Optional[Type[RetryAdapter]] = RetryAdapter(max_retries=MAX_RETRIES),
-        schema: Optional[str] = SCHEMA,
-        headers: Optional[Dict[str, str]] = HEADERS,
+        schema: Optional[str] = "https",
+        headers: Optional[dict] = {"Content-type": "application/json"},
         allow_redirects: Optional[bool] = False
     ) -> NoReturn:
         """ initialize class """
         self.baseurl = baseurl
         self.auth = auth
         self.verify = verify
-        self.retries = retries
         self.schema = schema
         self.headers = headers
         self.allow_redirects = allow_redirects
 
-    def encode_url(self, path: str, query_params: Dict[str, Any]) -> str:
-        """ generates uri for execution with query parameters """
-        query_params = urlencode(query_params)
-        return urlunsplit((self.schema, self.baseurl, path, query_params, ""))
+    def encode_url(self, path: str, query_params: dict) -> str:
+        """ encode url """
+        return urlunsplit((self.schema, self.baseurl, path, urlencode(query_params), ""))
 
-    def expected_status_code(self, method_name: str) -> List[int]:
+    def expected_status_code(self, http_method: str) -> list:
         """ sets expected status codes based on method type """
         status_codes = [200]
         with suppress(KeyError):
-            status_codes = STATUS_CODES[method_name.upper()]
+            status_codes = STATUS_CODES[http_method]
         return status_codes
+
+    def get(
+        self,
+        path: str,
+        query_params: Optional[dict] = {},
+        search_keys: Optional[list] = [],
+        status_codes: Optional[list] = [200]
+    ):
+        """ helper method for get request """
+        return self.request(
+            method="GET", 
+            path=path, 
+            query_params=query_params, 
+            search_keys=search_keys,
+            status_codes=status_codes
+        )
+
+    def head(
+        self,
+        path: str,
+        query_params: Optional[dict] = {},
+        search_keys: Optional[list] = [],
+        status_codes: Optional[list] = [200]
+    ):
+        """ helper method for head request """
+        return self.request(
+            method="HEAD", 
+            path=path, 
+            query_params=query_params, 
+            search_keys=search_keys,
+            status_codes=status_codes
+        )
+
+    def post(
+        self,
+        path: str,
+        query_params: Optional[dict] = {},
+        request_data: Optional[dict] = {},
+        search_keys: Optional[list] = [],
+        status_codes: Optional[list] = [200, 201, 204]
+    ):
+        """ helper method for post request """
+        return self.request(
+            method="POST", 
+            path=path, 
+            query_params=query_params,
+            request_data=request_data,
+            search_keys=search_keys,
+            status_codes=status_codes
+        )
+
+    def put(
+        self,
+        path: str,
+        query_params: Optional[dict] = {},
+        request_data: Optional[dict] = {},
+        search_keys: Optional[list] = [],
+        status_codes: Optional[list] = [200, 202, 204]
+    ):
+        """ helper method for put request """
+        return self.request(
+            method="PUT", 
+            path=path, 
+            query_params=query_params,
+            request_data=request_data,
+            search_keys=search_keys,
+            status_codes=status_codes
+        )
+
+    def delete(
+        self,
+        path: str,
+        query_params: Optional[dict] = {},
+        search_keys: Optional[list] = [],
+        status_codes: Optional[list] = [200, 202, 204]
+    ):
+        """ helper method for delete request """
+        return self.request(
+            method="DELETE", 
+            path=path, 
+            query_params=query_params,
+            search_keys=search_keys,
+            status_codes=status_codes
+        )
+
+    def patch(
+        self,
+        path: str,
+        query_params: Optional[dict] = {},
+        request_data: Optional[dict] = {},
+        search_keys: Optional[list] = [],
+        status_codes: Optional[list] = [200, 204]
+    ):
+        """ helper method for patch request """
+        return self.request(
+            method="PATCH", 
+            path=path, 
+            query_params=query_params,
+            request_data=request_data,
+            search_keys=search_keys,
+            status_codes=status_codes
+        )
 
     def request(
         self,
         method: str,
         path: str,
-        query_params: Optional[Dict[str, Any]] = {},
-        request_data: Optional[Dict[str, Any]] = {},
-        search_keys: Optional[List[str]] = [],
-        status_codes: Optional[List[int]] = None
+        query_params: Optional[dict] = {},
+        request_data: Optional[dict] = {},
+        search_keys: Optional[list] = [],
+        status_codes: Optional[list] = None
     ) -> Union[bool, str]:
         """ submits http request """
-        if method.upper() not in STATUS_CODES.keys():
-            raise RequestError(f"Unsupported method type: {method.upper()}")
+
+        http_method = method.upper()
 
         session = Session()
         session.auth = self.auth
@@ -82,44 +178,42 @@ class Requests:
 
         encoded_url = self.encode_url(path, query_params)
 
-        session.mount(encoded_url, self.retries)
-
         try:
-            if GET == method.upper():
+            if GET == http_method:
                 response = session.get(encoded_url)
-            if HEAD == method.upper():
+            elif HEAD == http_method:
                 response = session.head(encoded_url)
-            if POST == method.upper():
+            elif POST == http_method:
                 response = session.post(encoded_url, data=json.dumps(request_data))
-            if PUT == method.upper():
+            elif PUT == http_method:
                 response = session.put(encoded_url, data=json.dumps(request_data))
-            if DELETE == method.upper():
+            elif DELETE == http_method:
                 response = session.delete(encoded_url)
-            if PATCH == method.upper():
+            elif PATCH == http_method:
                 response = session.patch(encoded_url, data=json.dumps(request_data))
-
+            else:
+                raise RequestError(f"HTTP method type '{http_method}' is not supported.")
+    
             # raise exception for error codes 4xx or 5xx
             response.raise_for_status()
         except (requests.exceptions.HTTPError,
                 requests.ConnectionError,
                 requests.Timeout,
                 requests.exceptions.RequestException) as exception:
-            raise RequestError(getattr(exception, "message", repr(exception)))
+            message = getattr(exception, "message")
+            raise RequestError(message.strip(), response.status_code)
         finally:
             session.close()
 
         # get list of expected status codes, otherwise override 
         # with provided codes
-        expected_status_codes = (
-            self.expected_status_code(method) 
-                if status_codes is None else status_codes)
+        expected_status_codes = (self.expected_status_code(http_method) if status_codes is None else status_codes)
 
         # check if status code returned is "expected", otherwise 
         # raise ``HTTPError``
         if response.status_code not in expected_status_codes:
-            raise RequestError(
-                f"Unexpected HTTP status code '{response.status_code}' "
-                f"returned with reason '{response.reason}'")
+            raise RequestError(f"Unexpected HTTP status code '{response.status_code}' returned with "
+                               f"reason '{response.reason}'")
 
         # for responses with no content, return True to indicate 
         # that the request was successful
